@@ -1,0 +1,52 @@
+camera:
+  device_id: 0
+  width: 640
+  height: 480
+  fps: 30
+
+hand_tracking:
+  max_hands: 1
+  detection_confidence: 0.7
+  tracking_confidence: 0.5
+
+t2i_model:
+  model_name: "stabilityai/stable-diffusion-3.5-large-turbo"
+  inference_steps: 4
+  guidance_scale: 0.0
+  device: "cuda"  # or "cpu"
+  
+prompts:
+  default_prompts:
+    - x: 100
+      y: 100
+      prompt: "a serene landscape with mountains"
+      radius: 80
+    - x: 540
+      y: 100
+      prompt: "abstract digital art with vibrant colors"
+      radius: 80
+    - x: 320
+      y: 380
+      prompt: "futuristic cityscape at night"
+      radius: 80
+    - x: 100
+      y: 380
+      prompt: "underwater coral reef scene"
+      radius: 80
+    - x: 540
+      y: 380
+      prompt: "cosmic nebula in deep space"
+      radius: 80
+
+ui:
+  window_width: 1280
+  window_height: 720
+  update_rate: 30
+  camera_display_size: [640, 480]
+  generated_display_size: [512, 512]
+
+performance:
+  frame_skip: 3  # Generate every Nth frame
+  cache_size: 10  # Number of images to cache
+  use_threading: true
+  gpu_memory_fraction: 0.8
