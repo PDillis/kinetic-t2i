@@ -30,7 +30,7 @@ class StableDiffusionModel(BaseT2IModel):
     def __init__(self, 
                  model_name: str = "stabilityai/sdxl-turbo",
                  use_fp16: bool = True,
-                 compile_unet: bool = True):
+                 compile_unet: bool = False):
         """
         Initialize SDXL-Turbo model
         
@@ -85,12 +85,24 @@ class StableDiffusionModel(BaseT2IModel):
             if self.compile_unet and hasattr(torch, 'compile'):
                 logger.info("Compiling UNet for faster inference...")
                 try:
+                    self.pipe.unet.to(memory_format=torch.channels_last)
+                    self.pipe.vae.to(memory_format=torch.channels_last)
+
                     self.pipe.unet = torch.compile(
                         self.pipe.unet, 
-                        mode="reduce-overhead", 
-                        fullgraph=True
+                        mode="default", 
+                        fullgraph=False,  # Allow graph breaks
+                        dynamic=True,  # Handle dynamic shapes better
                     )
                     logger.info("UNet compiled successfully")
+
+                    self.pipe.vae.decode = torch.compile(
+                        self.pipe.vae.decode,
+                        mode="default",
+                        fullgraph=False,
+                        dynamic=True,
+                    )
+
                 except Exception as e:
                     logger.warning(f"Failed to compile UNet: {e}")
             
@@ -164,9 +176,32 @@ class StableDiffusionModel(BaseT2IModel):
             
             return output.images[0]
             
-        except Exception as e:
-            logger.error(f"Error generating image: {e}")
-            return Image.new('RGB', (config.width, config.height), color='red')
+        except RuntimeError as e:
+            if "CUDA" in str(e) or "compile" in str(e).lower():
+                logger.warning(f"Compilation error detected: {e}")
+                logger.warning("Falling back to non-compiled UNet")
+                
+                # Restore original UNet
+                if hasattr(self.pipe.unet, "_orig_mod"):
+                    self.pipe.unet = self.pipe.unet._orig_mod
+                    
+                # Try again without compilation
+                try:
+                    output = self.pipe(
+                        prompt=prompt,
+                        num_inference_steps=config.num_inference_steps,
+                        guidance_scale=config.guidance_scale,
+                        height=config.height,
+                        width=config.width,
+                        generator=generator,
+                    )
+                    return output.images[0]
+                except Exception as e2:
+                    logger.error(f"Error even without compilation: {e2}")
+                    return Image.new('RGB', (config.width, config.height), color='red')
+            else:
+                logger.error(f"Error generating image: {e}")
+                return Image.new('RGB', (config.width, config.height), color='red')
     
     def encode_prompts(self, prompts: List[str]) -> Dict[str, List[torch.Tensor]]:
         """Encode multiple prompts to embeddings"""

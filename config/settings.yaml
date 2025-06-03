@@ -10,8 +10,8 @@ hand_tracking:
   tracking_confidence: 0.5
 
 t2i_model:
-  model_name: "stabilityai/stable-diffusion-3.5-large-turbo"
-  inference_steps: 4
+  model_name: "stabilityai/sdxl-turbo"
+  inference_steps: 1
   guidance_scale: 0.0
   device: "cuda"  # or "cpu"
   
@@ -46,7 +46,9 @@ ui:
   generated_display_size: [512, 512]
 
 performance:
-  frame_skip: 3  # Generate every Nth frame
-  cache_size: 10  # Number of images to cache
+  frame_skip: 1  # Generate every Nth frame
+  cache_size: 100  # Number of images to cache
   use_threading: true
   gpu_memory_fraction: 0.8
+  pregenerate_images: true  # Set to true to pre-generate all grid images
+  grid_resolution: 32
