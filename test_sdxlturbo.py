@@ -310,7 +310,7 @@ def main():
     
     # Run tests
     model = test_basic_generation()
-    # test_speed_comparison(model)
+    test_speed_comparison(model)
     
     # Test prompt blending (reuse from previous implementation)
     test_prompt_blending(model)

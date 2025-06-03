@@ -132,7 +132,7 @@ def test_hand_tracking():
     # Initialize components
     try:
         camera = CameraInput(width=640, height=480)
-        hand_detector = HandDetector(max_num_hands=1)
+        hand_detector = HandDetector(max_num_hands=2)
     except Exception as e:
         print(f"Failed to initialize: {e}")
         return
@@ -162,9 +162,12 @@ def test_hand_tracking():
                 print("Failed to get frame")
                 break
             
+            # Mirror image
+            frame = cv2.flip(frame, 1)
+            
             # Convert to BGR for display
             frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-            
+
             # Detect hands
             hand_data = hand_detector.detect_hands(frame)
             

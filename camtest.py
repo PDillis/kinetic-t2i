@@ -70,23 +70,23 @@ def test_camera_feed():
     # Check for available cameras
     print("Checking for available cameras...")
     temp_camera = CameraInput()
-    available_cameras = temp_camera.list_available_cameras()
-    temp_camera.release()
+    # available_cameras = temp_camera.list_available_cameras()
+    # temp_camera.release()
     
-    if not available_cameras:
-        print("No cameras found!")
-        return
+    # if not available_cameras:
+    #     print("No cameras found!")
+    #     return
     
-    print(f"Found {len(available_cameras)} camera(s): {available_cameras}")
+    # print(f"Found {len(available_cameras)} camera(s): {available_cameras}")
     
     # Select camera
-    camera_id = 0
-    if len(available_cameras) > 1:
-        print(f"Using camera {camera_id}. Change camera_id in code to use a different camera.")
+    # camera_id = 0
+    # if len(available_cameras) > 1:
+    #     print(f"Using camera {camera_id}. Change camera_id in code to use a different camera.")
     
     # Initialize camera
     try:
-        camera = CameraInput(camera_id=camera_id, width=640, height=480)
+        camera = CameraInput(width=640, height=480)
     except Exception as e:
         print(f"Failed to initialize camera: {e}")
         return
